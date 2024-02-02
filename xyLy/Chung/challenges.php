@@ -152,7 +152,9 @@ checkauth();
   </style>
 </head>
 <body>
-            <?= getAllChallenge();?>
+            <script>
+              let xhr = new XMLHttpRequest();
+            </script>
   <!-- Bootstrap CDN -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.min.js"></script>

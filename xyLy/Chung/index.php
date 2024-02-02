@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<?php require('./function/function.php');?>
 <html>
     <head></head>
     <body>
@@ -20,5 +21,11 @@
         <div class="p">
             <a href="/challenges.php">Challenge page</a>
         </div>
+        <?php
+        if(checkRole()=="admin"){
+            echo '<div class="p">
+                    <a href="/quanly.php">Quan ly</a>
+                </div>';
+        }?>
     </body>
 </html>

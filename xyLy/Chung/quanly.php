@@ -21,14 +21,7 @@ checkauth();
                     <th scope='col'>Role</th>
                 </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <th scope='col' id="ma"></th>
-                        <th scope='col' id="fullname"></th>
-                        <th scope='col' id="email"></th>
-                        <th scope='col' id="role"></th>
-                    </tr>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
         <script>
@@ -37,14 +30,13 @@ checkauth();
                 xhr.onreadystatechange =function(){
                     if(xhr.status == 200 || xhr.readyState==4){
                         let x = xhr.responseText;
-                        x = JSON.parse(x)
-                        document.getElementById('ma').innerText=x.user[0].ma
-                        document.getElementById('fullname').innerText=x.user[0].fullname
-                        document.getElementById('email').innerText=x.user[0].email
-                        document.getElementById('role').innerText=x.user[0].role
+                        console.log(x)
+                        users = JSON.parse(x)
+                        const uniqueRoles = [...new Set(users.map(user => user.role))];
+                        console.log(uniqueRoles)
                     }
                 }
-                xhr.open('GET','api.php?choose=listOne',false);
+                xhr.open('GET','api.php?choose=listAll&limit=2',false);
                 xhr.send()
             }catch(err){
                 alert("Some thing is wrong");

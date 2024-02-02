@@ -3,7 +3,7 @@
 require("sql.php");
 $message = "Only user be there";
 //=====================Authenticate function===========================//
-function checkauth(){ //done
+function checkauth(){ //done api
     /**
      * cach file can authenticate se su dung ham nay
     */
@@ -13,15 +13,17 @@ function checkauth(){ //done
     }
     return true;
 }
-function checkRole(){ //done
-    if($_SESSION['role'] == "admin"){
-        return "admin";
-    } 
-    if($_SESSION['role'] === "guest"){
-        return "guest";
+function checkRole(){ //done api
+    if(isset($_SESSION['role'])){
+        if($_SESSION['role'] == "admin"){
+            return "admin";
+        } 
+        if($_SESSION['role'] === "guest"){
+            return "guest";
+        }
     }
 }
-function register($username,$password){ // done
+function register($username,$password){ // done api
     /**
      * Only add role student.
     */
@@ -41,7 +43,7 @@ function register($username,$password){ // done
     header("Location:/login.php");
     exit();
 }
-function login($username,$password){ // done
+function login($username,$password){ // done api
     /**
      * login success -> add session role and redirect role by role
     */
@@ -71,55 +73,35 @@ function login($username,$password){ // done
     
 }
 //====================CHUNG=======================================//
-function getAllChallenge(){ // done
+function getAllChallenge(){ // done api
     try{
+        header("Content-type:application/json;charset:utf-8");
+        $arrayChallenges = array();
         global $conn;
         $query = $conn->prepare("SELECT * FROM challenges");
         $query->execute();
         $rows = $query->get_result();
         while($result = $rows->fetch_assoc()){
-            echo "
-            <div class='container-fluid'>
-                <div class='row justify-content-center'>
-                    <div class='col-12 col-md-8 col-lg-6 col-xl-4'>
-                        <div class='card bg-purple shadow p-4 m-4 max-h-screen overflow-y-auto'>
-                        <button class='close' onclick='this.parentElement.style.display='none''>×</button>
-                        <div class='card-body text-white'>
-                            <div class='flex flex-row justify-between items-center mb-4'>
-                                <h1 class='card-title text-xl font-bold'>$result[name]</h1>
-                                <span class='card-subtitle text-sm font-light'>$result[point] Points</span>
-                            </div>
-                            <p class='card-text text-lg font-light'>$result[description]. You will need this and this: konctf{uwsp_ _ _}</p>
-                            <span><a href='$result[link]'>Link</a></span>
-                            <div class='flex flex-col mt-4'>
-                                <button class='btn btn-purple mt-4'>Show 104 others</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-          </div>
-        </div>
-            ";
+            array_push($arrayChallenges,(object)$result);
         }
+        echo json_encode(["challenges"=>$arrayChallenges]);
     }catch(Exception $e){
         echo "Not any challenges is available!!";
     }
 }
-function getInformation($ma){ // done
+function getInformation(){ // done api
     try{
+        header("Content-type:application/json;charset:utf-8");
+        $arrayUser = array();
         global $conn;
         $query = $conn->prepare("SELECT * FROM users WHERE ma = ?");
-        $query->bind_param("s",$ma);
+        $query->bind_param("s",$_SESSION['ma']);
         $query->execute();
-        $result = $query->get_result()->fetch_assoc();
-        echo "
-          <tr>
-            <th scope='row'>$result[ma]</th>
-            <td>$result[fullname]</td>
-            <td>$result[email]</td>
-            <td>$result[role]</td>
-          </tr>
-        ";
+        $result = $query->get_result();
+        while($row = $result->fetch_assoc()){
+            array_push($arrayUser,(object)$row);
+        }
+        echo json_encode(['user'=>(object)$arrayUser]);
     }catch(Exception $e){
         echo "Infomation not validate";
     }
@@ -171,6 +153,21 @@ function updateChallenge(){
 
 }
 function deleteChallenge(){
+}
+function getAllUser(){ //done api
+    $arratUser = array();
+    header("Content-type: application/json; charset=utf-8");
+    global $conn;
+    $limit = $_GET['limit'];
+    $sql = "SELECT * from users order by ma limit ?";
+    $query = $conn->prepare($sql);
+    $query->bind_param("s",$limit);
+    $query->execute();
+    $result = $query->get_result();
+    while($row =$result->fetch_assoc()){
+        array_push($arratUser,$row);
+    };
+    echo json_encode(["users"=>$arratUser]);
 }
 //======================CTF-Playyer================================//
 function addSolution(){
