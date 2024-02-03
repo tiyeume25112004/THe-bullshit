@@ -13,7 +13,7 @@ if(checkRole()!=="admin"){
 <html>
     <head><title>Upload</title></head>
     <body>
-        <?= createChallange() ?>
+        <?= createChallange(); ?>
         <form method="post" enctype="multipart/form-data" id="usrform">
             <div>
                 <input type="file" name="file">
@@ -27,7 +27,7 @@ if(checkRole()!=="admin"){
             <div>
                 <input type="text" name="point" placeholder="point">
             </div>
-            <button>Enter</button>
+            <button name="sub">Enter</button>
         </form>
     </body>
 </html>

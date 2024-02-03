@@ -89,6 +89,22 @@ function getAllChallenge(){ // done api
         echo "Not any challenges is available!!";
     }
 }
+function getOneChallenge($ma){ //done api
+    try{
+        $arrayChallenges = array();
+        global $conn;
+        $query = $conn->prepare("SELECT * FROM challenges where ma = ?");
+        $query->bind_param("s",$ma);
+        $query->execute();
+        $rows = $query->get_result();
+        while($result = $rows->fetch_assoc()){
+            array_push($arrayChallenges,(object)$result);
+        }
+        echo json_encode(["challenges"=>$arrayChallenges]);
+    }catch(Exception $e){
+        echo "Not any challenges is available!!";
+    }
+}
 function getInformation(){ // done api
     try{
         header("Content-type:application/json;charset:utf-8");
@@ -106,12 +122,36 @@ function getInformation(){ // done api
         echo "Infomation not validate";
     }
 }
-function updateInfomation(){
-
+function updateInfomation(){ //done api
+    try{
+        global $conn;
+        $_fullname = $_POST['fullname'];
+        $_email = $_POST['email'];
+        $_password = $_POST['password'];
+        $_ma = $_SESSION['ma'];
+        $sql = "UPDATE users SET fullname = ?,email =?,password =? WHERE ma =?";
+        $query = $conn->prepare($sql);
+        $query->bind_param("ssss",$_fullname,$_email,$_password,$_ma);
+        $query->execute();
+        echo json_encode(["status"=>"ok"]);
+    }catch(Exception $e){
+        echo json_encode(["status"=>"Something error!!"]);
+    }
 }
-function deleteInformation(){
+function deleteInformation(){ // done api
+    try{
+        global $conn;
+        $_ma = $_SESSION['ma'];
+        $sql = "Delete from users where ma = ?";
+        $query = $conn->prepare($sql);
+        $query->bind_param("ssss",$_ma);
+        $query->execute();
+        echo json_encode(["status"=>"ok"]);
+    }catch(Exception $e){
+        echo json_encode(["status"=>"Something error!!"]);
+    }
 }
-function updateScore(){
+function updateScore(){ 
 }
 function genMa(){ //done
     return uniqid();
@@ -129,30 +169,58 @@ function uploadFile(){ //done
 function getRanking(){
 }
 //=====================CTF-Admin==============================//
-function createChallange(){ //done
+function createChallange(){ //done api
     /**
      * Nhan link tu uploadFile()
      * Chen thong tin vo database
     */
+    if(isset($_POST['sub'])){
+        try{
+            $link = uploadFile();
+            echo $link;
+            $name = $_POST['name'];
+            $description = $_POST['description'];
+            $point = $_POST['point'];
+            $ma = genMa();
+            global $conn;
+            $query = $conn->prepare("INSERT INTO challenges(ma,name,description,link,point) values (?,?,?,?,?)");
+            $query->bind_param("ssssi",$ma,$name,$description,$link,$point);
+            $query->execute();
+            echo json_encode(["challenge"=>"okay"]);
+        }catch(Exception $e){
+            echo json_encode(["status"=>"Can't create challenge!!"]);
+        }
+    }
+}
+function updateChallenge($ma){ //done api
     try{
-        $link = uploadFile();
-        echo $link;
+        if($_POST['link_fixed']){
+            $link = uploadFile();
+        }else{
+            $link = "www";
+        }
         $name = $_POST['name'];
         $description = $_POST['description'];
         $point = $_POST['point'];
-        $ma = genMa();
         global $conn;
-        $query = $conn->prepare("INSERT INTO challenges(ma,name,description,link,point) values (?,?,?,?,?)");
-        $query->bind_param("ssssi",$ma,$name,$description,$link,$point);
+        $query = $conn->prepare("UPDATE challenges SET name=?,description=?,link=?,point=? WHERE ma=?");
+        $query->bind_param("sssis",$name,$description,$link,$point,$ma);
         $query->execute();
+        echo json_encode(["status"=>"ok"]);
     }catch(Exception $e){
-        echo "Can't create challenge!!";
+        echo json_encode(["status"=>"Can't update challenge!!"]);
     }
 }
-function updateChallenge(){
-
-}
-function deleteChallenge(){
+function deleteChallenge($ma){
+    try{
+        global $conn;
+        $query = $conn->prepare("DELETE FROM challenges WHERE ma=?");
+        $query->bind_param("s",$ma);
+        $query->execute();
+        echo json_encode(["status"=>"ok"]);
+    }catch(Exception $e){
+        echo json_encode(["status"=>"Can't update challenge!!"]);
+    }
 }
 function getAllUser(){ //done api
     $arratUser = array();
