@@ -15,13 +15,17 @@ checkauth();
             <table class='table'>
                 <thead class='thead-light'>
                 <tr>
-                    <th scope='col'>#</th>
-                    <th scope='col'>Fullname</th>
+                    <th scope='col'>UserID</th>
+                    <th scope='col'>Username</th>
+                    <th scope='col'>password</th>
                     <th scope='col'>Email</th>
+                    <th scope='col'>Fullname</th>
                     <th scope='col'>Role</th>
+                    <th scope='col'>Score</th>
                 </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="table-body">
+                </tbody>
             </table>
         </div>
         <script>
@@ -29,18 +33,36 @@ checkauth();
                 let xhr = new XMLHttpRequest();
                 xhr.onreadystatechange =function(){
                     if(xhr.status == 200 || xhr.readyState==4){
-                        let x = xhr.responseText;
-                        console.log(x)
-                        users = JSON.parse(x)
-                        const uniqueRoles = [...new Set(users.map(user => user.role))];
-                        console.log(uniqueRoles)
+                        let data = JSON.parse(xhr.responseText);
+                        document.getElementById("table-body").innerHTML=renderTable(data)
+                        console.log(renderTable(data))
                     }
                 }
-                xhr.open('GET','api.php?choose=listAll&limit=2',false);
+                xhr.open('GET','api.php?choose=listAllUser&limit=8',false);
                 xhr.send()
             }catch(err){
                 alert("Some thing is wrong");
             }
+            function renderTable(data){
+                html = ""
+                for(let key in data.users){
+                            if(data.users.hasOwnProperty(key)){
+                                row =data.users[key]
+                                html += `
+                                    <tr>
+                                        <th scope='row'>${parseInt(key) + 1}</th>
+                                        <td>${row.userID}</td>
+                                        <td>${row.username}</td>
+                                        <td>${row.password}</td>
+                                        <td>${row.email}</td>
+                                        <td>${row.fullname}</td>
+                                        <td>${row.role}</td>
+                                        <td>${row.total_score}</td>
+                                        </tr>`;
+                            }
+                        }
+                    return html
+                }
         </script>
     </body>
 </html>

@@ -5,8 +5,12 @@ if(isset($_SESSION['role'])){
     header("Location:/info.php");
     exit();
 }
-if(isset($_POST['username']) && isset($_POST['password'])){
-    register($_POST['username'],$_POST['password']);
+if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['email'])){
+    try{
+        register($_POST['username'],$_POST['password'],$_POST['email']);
+    }catch(Exception $e){
+        echo "<script>alert('Wrong')</script>";
+    }
 }
 ?>
 <!DOCTYPE html>

@@ -27,6 +27,7 @@ checkauth();
                         <th scope='col' id="fullname"></th>
                         <th scope='col' id="email"></th>
                         <th scope='col' id="role"></th>
+                        <th scope='col' id="score"></th>
                     </tr>
                 </tbody>
             </table>
@@ -38,13 +39,14 @@ checkauth();
                     if(xhr.status == 200 || xhr.readyState==4){
                         let x = xhr.responseText;
                         x = JSON.parse(x)
-                        document.getElementById('ma').innerText=x.user[0].ma
+                        document.getElementById('ma').innerText=x.user[0].userID
                         document.getElementById('fullname').innerText=x.user[0].fullname
                         document.getElementById('email').innerText=x.user[0].email
                         document.getElementById('role').innerText=x.user[0].role
+                        document.getElementById('score').innerText=x.user[0].total_score
                     }
                 }
-                xhr.open('GET','api.php?choose=listOne',false);
+                xhr.open('GET','api.php?choose=listOneUser',false);
                 xhr.send()
             }catch(err){
                 alert("Some thing is wrong");

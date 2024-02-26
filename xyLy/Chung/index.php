@@ -4,7 +4,7 @@
     <head></head>
     <body>
         <div class="p">
-            <a href=""></a>
+            <a href="#">Home page</a>
         </div>
         <div class="p">
             <a href="login.php">Login page</a>

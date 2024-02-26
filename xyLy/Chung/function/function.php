@@ -23,19 +23,19 @@ function checkRole(){ //done api
         }
     }
 }
-function register($username,$password){ // done api
+function register($username,$password,$email){ // done api
     /**
      * Only add role student.
     */
     $username = trim($username);
     $password = trim($password);
+    $email = trim($email);
     $ma = genMa();
-    $sql = "INSERT INTO users(ma,username,password,email,fullname,role) VALUES (?,?,?,'tricker@gmail.com','tobirama','admin')";
-    
+    $sql = "INSERT INTO users(userID,username,password,email,fullname,role) VALUES (?,?,?,?,'tobirama','user')";
     try{
         global $conn;
         $query = $conn->prepare($sql);
-        $query->bind_param("sss",$ma,$username,$password);
+        $query->bind_param("ssss",$ma,$username,$password,$email);
         $query->execute();
     }catch(Exception $e){
         echo "Error!";
@@ -58,7 +58,7 @@ function login($username,$password){ // done api
         $result = $query->get_result();
         if($result->num_rows>0){
             $rows = $result->fetch_assoc();
-            $_SESSION['ma'] = $rows["ma"];
+            $_SESSION['ma'] = $rows["userID"];
             $_SESSION['name'] = $rows["username"];
             $_SESSION['role'] = $rows["role"];
             echo '<script>alert("Login thành công")</script>';
@@ -84,7 +84,7 @@ function getAllChallenge(){ // done api
         while($result = $rows->fetch_assoc()){
             array_push($arrayChallenges,(object)$result);
         }
-        echo json_encode(["challenges"=>$arrayChallenges]);
+        echo json_encode(["challenges"=>(object)$arrayChallenges]);
     }catch(Exception $e){
         echo "Not any challenges is available!!";
     }
@@ -110,7 +110,7 @@ function getInformation(){ // done api
         header("Content-type:application/json;charset:utf-8");
         $arrayUser = array();
         global $conn;
-        $query = $conn->prepare("SELECT * FROM users WHERE ma = ?");
+        $query = $conn->prepare("SELECT * FROM users WHERE userID = ?");
         $query->bind_param("s",$_SESSION['ma']);
         $query->execute();
         $result = $query->get_result();
@@ -129,7 +129,7 @@ function updateInfomation(){ //done api
         $_email = $_POST['email'];
         $_password = $_POST['password'];
         $_ma = $_SESSION['ma'];
-        $sql = "UPDATE users SET fullname = ?,email =?,password =? WHERE ma =?";
+        $sql = "UPDATE users SET fullname = ?,email =?,password =? WHERE userID =?";
         $query = $conn->prepare($sql);
         $query->bind_param("ssss",$_fullname,$_email,$_password,$_ma);
         $query->execute();
@@ -183,7 +183,7 @@ function createChallange(){ //done api
             $point = $_POST['point'];
             $ma = genMa();
             global $conn;
-            $query = $conn->prepare("INSERT INTO challenges(ma,name,description,link,point) values (?,?,?,?,?)");
+            $query = $conn->prepare("INSERT INTO challenges(challengeID,name,description,link,point) values (?,?,?,?,?)");
             $query->bind_param("ssssi",$ma,$name,$description,$link,$point);
             $query->execute();
             echo json_encode(["challenge"=>"okay"]);
@@ -203,7 +203,7 @@ function updateChallenge($ma){ //done api
         $description = $_POST['description'];
         $point = $_POST['point'];
         global $conn;
-        $query = $conn->prepare("UPDATE challenges SET name=?,description=?,link=?,point=? WHERE ma=?");
+        $query = $conn->prepare("UPDATE challenges SET name=?,description=?,link=?,point=? WHERE challengeID=?");
         $query->bind_param("sssis",$name,$description,$link,$point,$ma);
         $query->execute();
         echo json_encode(["status"=>"ok"]);
@@ -214,7 +214,7 @@ function updateChallenge($ma){ //done api
 function deleteChallenge($ma){
     try{
         global $conn;
-        $query = $conn->prepare("DELETE FROM challenges WHERE ma=?");
+        $query = $conn->prepare("DELETE FROM challenges WHERE challengeID=?");
         $query->bind_param("s",$ma);
         $query->execute();
         echo json_encode(["status"=>"ok"]);
@@ -227,7 +227,7 @@ function getAllUser(){ //done api
     header("Content-type: application/json; charset=utf-8");
     global $conn;
     $limit = $_GET['limit'];
-    $sql = "SELECT * from users order by ma limit ?";
+    $sql = "SELECT * from users order by userID limit ?";
     $query = $conn->prepare($sql);
     $query->bind_param("s",$limit);
     $query->execute();
@@ -235,7 +235,7 @@ function getAllUser(){ //done api
     while($row =$result->fetch_assoc()){
         array_push($arratUser,$row);
     };
-    echo json_encode(["users"=>$arratUser]);
+    echo json_encode(["users"=>(object)$arratUser]);
 }
 //======================CTF-Playyer================================//
 function addSolution(){
