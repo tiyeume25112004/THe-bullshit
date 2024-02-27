@@ -1,4 +1,7 @@
 <?php
+
+use LDAP\Result;
+
 @session_start();
 require("sql.php");
 $message = "Only user be there";
@@ -151,7 +154,19 @@ function deleteInformation(){ // done api
         echo json_encode(["status"=>"Something error!!"]);
     }
 }
-function updateScore(){ 
+function updateScore($challengeID,$answer){ 
+    try{
+        global $conn;
+        $sql = "select  flag from challenges where challengeID = ?";
+        $query = $conn->prepare($sql);
+        $query->bind_param("s",$challengeID);
+        $query->execute();
+        $result = $query->get_result();
+        // lấy flag từ database;
+        // check kết quả user nếu trùng flag thì lấy score người dùng trong db + với điểm challenge
+        // lưu lại vô database
+
+    }
 }
 function genMa(){ //done
     return uniqid();
