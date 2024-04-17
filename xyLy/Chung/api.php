@@ -2,7 +2,7 @@
 require('./function/function.php');
 checkauth();
 
-$message = "";
+$message = ""; 
 if($_GET['choose']){
     try{
         switch($_GET['choose']){
